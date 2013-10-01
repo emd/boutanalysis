@@ -41,3 +41,24 @@ def grid2q(g):
 
     # ShiftAngle is the change in *toroidal* angle per poloidal transit
     return np.abs(g['ShiftAngle']) / (2 * np.pi)
+
+
+def grid_path(input_file):
+    '''Return the path to a grid file given the path to the BOUT.inp file.
+
+    Parameters:
+    input_file -- string, path to the BOUT.inp file
+
+    Returns:
+    path to the grid file
+
+    NOTE: Assumes the path is the FIRST item denoted with 'grid' in BOUT.inp
+    and also assumes it is of the form
+                              grid = "..."
+    Otherwise, this will fail... there may be a better way than this... 
+
+    '''
+    for line in open(input_file):
+        if 'grid' in line:
+            return str.split(line, '"')[1]
+
