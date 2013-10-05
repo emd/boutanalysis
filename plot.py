@@ -1,5 +1,11 @@
 '''Plot useful BOUT++ results quickly and easily.'''
 
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import interpolate
+    
+from boutanalysis import grid
+
 
 def contour_over_psi0(s, g, RZ = False):
     '''Create contour plot of signal s over the equilibrium flux surfaces.
@@ -13,10 +19,6 @@ def contour_over_psi0(s, g, RZ = False):
     ???? I'm sure this could be modified to return somehting useful...
 
     '''
-    import numpy as np
-    import matplotlib.pyplot as plt
-    
-    from boutanalysis import grid
 
     # Compute *equilibrium* normalized flux coordinates
     psi0 = grid.grid2psi(g)
@@ -38,3 +40,21 @@ def contour_over_psi0(s, g, RZ = False):
         Cs = plt.contourf(s, 30)
         plt.colorbar(Cs)
     plt.show()
+
+
+def eps_p(g, interp = False):
+    '''Plot the expansion parameter eps_p = rho_s / L_n.'''
+    psi0 = grid.grid2psi(g, vector = True)
+    eps_p = grid.eps_p(g)
+   
+    # Does not work yet... 
+    #if interp:
+    #    tck = interpolate.splrep(psi0, eps_p)
+    #    psi0 = np.linspace(np.min(psi0), np.max(psi0), 250)
+    #    eps_p = interpolate.splev(psi0, tck)   
+
+    plt.plot(psi0, eps_p)
+    plt.xlabel('$\psi$')
+    plt.ylabel('$\epsilon_p = \\rho_s / L_p$')
+    plt.show()    
+
