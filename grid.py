@@ -1,5 +1,6 @@
 '''Interact with BOUT++ grids, particularly those generated via Hypnotoad.'''
 
+import numpy as np
 
 def grid2psi(g, vector = False, yind = None):
     '''Calculate the normalized flux coordinate psi from BOUT++ grid file g.
@@ -37,7 +38,7 @@ def grid2q(g):
     the q profile with the radial resolution of the input grid file
 
     '''
-    import numpy as np
+    #import numpy as np
 
     # ShiftAngle is the change in *toroidal* angle per poloidal transit
     return np.abs(g['ShiftAngle']) / (2 * np.pi)
@@ -62,3 +63,60 @@ def grid_path(input_file):
         if 'grid' in line:
             return str.split(line, '"')[1]
 
+
+def outboard_midplane_index(g):
+    '''Return the *poloidal* index for the outboard midplane of a BOUT++ grid.
+
+    Parameters:
+    g -- the BOUT++ grid file, i.e. as computed from Hypnotoad
+
+    Returns:
+    The poloidal index of the outboard midplane 
+
+    NOTE: Assumes the outboard midplane occurs where the plasma 
+    achieves its *largest* major radius coordinate.
+
+    '''
+    return np.where(g['Rxy'] == np.max(g['Rxy']))[1]   
+
+ 
+
+def eps_p(g):
+    '''Return the expansion parameter epsilon_p = rho_s / L_p.
+
+    Parameters:
+    g -- the BOUT++ grid file, i.e. as computed from Hypnotoad
+
+    Returns:
+    epsilon_p = rho_s / L_p, which is a common expansion parameter
+        used in gyrokinetics and MHD. rho_s is the ion sound 
+        gyroradius, while L_p is the pressure scale length.
+
+    '''
+    A = 2 # mass number of deuteron
+    
+    ind = outboard_midplane_index(g) 
+    R = g['Rxy'][:, ind] # [R] = m 
+    B = g['Bxy'][:, ind] # [B] = T
+    Te = g['Te0'][:, ind] # [Te] = eV
+    p = g['pressure'][:, ind] # [p] = Pascals
+    
+    R = np.squeeze(R)
+    B = np.squeeze(B)
+    Te = np.squeeze(Te)
+    p = np.squeeze(p)
+
+    rho_s = 1.02e-4 * (np.sqrt(A * Te) / B) # [rho_s] = m
+
+    grad_p = np.abs(np.gradient(p) / np.gradient(R)) 
+    
+    # Find where the pressure has zero gradient (such as in the SOL);
+    # these regions can cause divide by zero errors in the L_p calculation
+    ind1 = np.where(grad_p != 0)
+    ind2 = np.where(grad_p == 0)
+ 
+    L_p = np.zeros(len(p))
+    L_p[ind1] = p[ind1] / grad_p[ind1]
+    L_p[ind2] = None
+
+    return rho_s / L_p 
