@@ -13,7 +13,7 @@ def omega_star_i(g, n, kappa, a, norm = True,
         (i.e. a is the plasma minor radius)
     a -- scalar, the plasma minor radius; units = [m]
     norm -- boolean, normalize the ion diamagnetic frequency to the
-        BOUT++ Alfven frequecny if True; use physical units if False
+        BOUT++ Alfven frequency if True; use physical units if False
     Z -- integer, the ion atomic number (i.e. number of protons)
     A -- integer, the ion mass number (i.e. m_i = A * m_p)
     denisty_norm -- scalar, the particle density normalization
@@ -39,7 +39,7 @@ def omega_star_i(g, n, kappa, a, norm = True,
     q = np.abs(g['ShiftAngle']) / (2 * np.pi)
 
     # the poloidal wavenumber
-    # units: [k_theta] = m
+    # units: [k_theta] = m^{-1}
     k_theta = n * q / (np.sqrt(kappa) * a)
 
     # Now, compute the ion diamagnetic velocity, V_D = (dp/dr) / (ni * q * B)
@@ -50,7 +50,7 @@ def omega_star_i(g, n, kappa, a, norm = True,
     # poloidal (y) index as the grid point with *maximum* R.
     #
     ind = np.where(g['Rxy'] == np.max(g['Rxy']))[1]
-    p = 0.5 * g['pressure'][:, ind] # [p] = Pa, p_i = p_e = p / 2
+    p = 0.5 * g['pressure'][:, ind] # [p] = N/m^2, p_i = p_e = p / 2
     R = g['Rxy'][:, ind] # [R] = m
     B = g['Bxy'][:, ind] # [B] = T
 
