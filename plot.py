@@ -7,19 +7,22 @@ from scipy import interpolate
 from boutanalysis import grid
 
 
-def contour_over_psi0(s, g, RZ = False):
+def contour_over_psi0(s, g, RZ = False, show = False):
     '''Create contour plot of signal s over the equilibrium flux surfaces.
 
     Parameters:
     s -- 2d signal s(x,y)
     g -- BOUT++ grid file, e.g. as created by hypnotoad
     RZ -- boolean; real space (R,Z) if true, in field-aligned (x,y) if False
-
+    show -- boolean; show the resulting figure; when batch processing,
+        set to False and save returned figure fo later viewing, but
+        during an interactive session, set to True
+ 
     Returns:
-    ???? I'm sure this could be modified to return somehting useful...
+    The figure object fig. This can be displayed later via plt.show(fig)
+    or saved for later viewing via fig.savefig('foo.pdf').
 
     '''
-
     # Compute *equilibrium* normalized flux coordinates
     psi0 = grid.grid2psi(g)
 
@@ -39,7 +42,11 @@ def contour_over_psi0(s, g, RZ = False):
         plt.clabel(Cpsi0, inline = 1)
         Cs = plt.contourf(s, 30)
         plt.colorbar(Cs)
-    plt.show()
+    
+    if show:
+        plt.show()
+    
+    return fig
 
 
 def eps_p(g, interp = False):
