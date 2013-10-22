@@ -49,6 +49,40 @@ def contour_over_psi0(s, g, RZ = False, show = False):
     return fig
 
 
+def growth_rate(gamma, t = None, show = False):
+    '''Plot the growth rate gamma vs time t.
+
+    Parameters:
+    gamma -- array; a 1d signal gamma(t) giving growth rate as a 
+        function of time
+    t -- array; the time basis corresponding to gamma; if this 
+        array is *not* specified, it will be assumed that 
+        the time difference between successive points is one Alven time 
+    show -- boolean; show the resulting figure; when batch processing,
+        set to False and save returned figure fo later viewing, but
+        during an interactive session, set to True
+ 
+    Returns:
+    The figure object fig. This can be displayed later via plt.show(fig)
+    or saved for later viewing via fig.savefig('foo.pdf').
+    '''
+    fig = plt.figure()
+    
+    if t is None:
+        plt.plot(gamma)
+    else:
+        # gamma is computed via np.diff(), and thus is reduced in length
+        # by one relative to the time array
+        plt.plot(t[0:-1], gamma)
+    plt.xlabel('$t$ $[\\tau_A]$')
+    plt.ylabel('$\gamma$ $[\omega_A]$')
+    
+    if show:
+        plt.show()
+  
+    return fig
+
+
 def eps_p(g, interp = False):
     '''Plot the expansion parameter eps_p = rho_s / L_n.'''
     psi0 = grid.grid2psi(g, vector = True)
