@@ -73,7 +73,7 @@ def growth_rate(gamma, t = None, show = False):
     else:
         # gamma is computed via np.diff(), and thus is reduced in length
         # by one relative to the time array
-        plt.plot(t[0:-1], gamma)
+        plt.plot(t[1:-2], gamma)
     plt.xlabel('$t$ $[\\tau_A]$')
     plt.ylabel('$\gamma$ $[\omega_A]$')
     
