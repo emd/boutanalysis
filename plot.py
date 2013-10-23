@@ -26,11 +26,10 @@ def contour_over_psi0(s, g, RZ = False, show = False):
     # Compute *equilibrium* normalized flux coordinates
     psi0 = grid.grid2psi(g)
 
-    # Number of psi contours. Ideas is to have a contour for every 0.01
-    nLev = int(np.round((np.max(psi0) - np.min(psi0)) * 100))
-
     fig = plt.figure()
     if RZ:
+        # Number of psi contours. Ideas is to have a contour for every 0.01
+        nLev = int(np.round((np.max(psi0) - np.min(psi0)) * 100 / 5))
         ax = fig.add_subplot(111)
         Cpsi0 = ax.contour(g['Rxy'], g['Zxy'], psi0, nLev, colors = 'k')
         plt.clabel(Cpsi0, inline = 1)
@@ -38,6 +37,8 @@ def contour_over_psi0(s, g, RZ = False, show = False):
         plt.colorbar(Cs)
         ax.set_aspect('equal')
     else:
+        # Number of psi contours. Ideas is to have a contour for every 0.01
+        nLev = int(np.round((np.max(psi0) - np.min(psi0)) * 100))
         Cpsi0 = plt.contour(psi0, nLev, colors = 'k')
         plt.clabel(Cpsi0, inline = 1)
         Cs = plt.contourf(s, 30)
