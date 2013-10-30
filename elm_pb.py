@@ -7,7 +7,7 @@ def omega_star_i(g, n, kappa, a, norm = True,
 
     Parameters:
     g -- a BOUT++ grid file, e.g. as generated from Hypnotoad
-    n -- scalar, the toroidal mode number
+    n -- numpy array, the toroidal mode number(s)
     kappa -- scalar, the plasma elongation, defined as b = kappa * a,
         where b is the semi-major axis and a is the semi-minor axis
         (i.e. a is the plasma minor radius)
@@ -20,7 +20,13 @@ def omega_star_i(g, n, kappa, a, norm = True,
         used in BOUT.inp
 
     Returns:
-    the ion diamagnetic frequency, with units dictated by norm
+    An array of the ion diamagnetic frequency, with units dictated by norm.
+    The array is (m1, m2) in dimensions, with m1 = len(n) and 
+    m2 = the number of radial grid points on the grid g. 
+
+    Thus, if n = np.array([5,10,15,...]) and one wants ion diamagnetic 
+    frequency profile corresponding to n = 15, one simply accesses 
+    omega_star_i[3, :] 
 
     NOTE: The following assumptions are made to simplify the calculation:
     - The ion diamagnetic velocity is taken purely in the *poloidal*
@@ -40,7 +46,7 @@ def omega_star_i(g, n, kappa, a, norm = True,
 
     # the poloidal wavenumber
     # units: [k_theta] = m^{-1}
-    k_theta = n * q / (np.sqrt(kappa) * a)
+    k_theta = np.outer(n, q) / (np.sqrt(kappa) * a)
 
     # Now, compute the ion diamagnetic velocity, V_D = (dp/dr) / (ni * q * B)
     # units: [V_D] = m/s
