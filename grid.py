@@ -1,6 +1,7 @@
 '''Interact with BOUT++ grids, particularly those generated via Hypnotoad.'''
 
 import numpy as np
+from scipy import interpolate
 
 def grid2psi(g, vector = False, yind = None):
     '''Calculate the normalized flux coordinate psi from BOUT++ grid file g.
@@ -79,7 +80,36 @@ def outboard_midplane_index(g):
     '''
     return np.where(g['Rxy'] == np.max(g['Rxy']))[1]   
 
+
+def outboard_midplane_LCFS(g, units = 'cm'):
+    '''Return array of distances from LCFS along outboard midplane.
+    
+    Parameters:
+    g -- the BOUT++ grid file, i.e. as computed from Hypnotoad
+    units -- string; unit of distance; available: m, cm, mm
+   
+    Returns:
+    An array of distances from the Last Closed Flux Surface (LCFS), 
+    or separatrix, along the outboard midplane in specified units. 
  
+    ''' 
+    psi0 = grid2psi(g, vector = True)
+    polind = outboard_midplane_index(g)
+    R = np.squeeze(g['Rxy'][:, polind]) # [R] = m
+    
+    tck = interpolate.splrep(psi0, R)
+    Rsep = interpolate.splev(1.0, tck)
+    dR = R - Rsep 
+
+    if units == 'm':
+        return dR
+    elif units == 'cm':
+        return 100 * dR
+    elif units == 'mm':
+        return 1000 * dR
+    else:
+        raise ValueError, "units can have values of 'm', 'cm', and 'mm'"  
+
 
 def eps_p(g):
     '''Return the expansion parameter epsilon_p = rho_s / L_p.
