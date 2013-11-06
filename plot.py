@@ -28,7 +28,7 @@ def contour_over_psi0(s, g, RZ = False, show = False):
 
     fig = plt.figure()
     if RZ:
-        # Number of psi contours. Ideas is to have a contour for every 0.01
+        # Number of psi contours. Ideas is to have a contour for every 0.05
         nLev = int(np.round((np.max(psi0) - np.min(psi0)) * 100 / 5))
         ax = fig.add_subplot(111)
         Cpsi0 = ax.contour(g['Rxy'], g['Zxy'], psi0, nLev, colors = 'k')
