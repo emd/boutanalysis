@@ -81,10 +81,10 @@ def growth_rate(s, t = None, plot = True):
 
 
 def omega(s, t, t0):
-    '''Compute the angular frequency of a 1d signal s = s(t,x,y,z).
+    '''Compute the angular frequency of a 1d signal s = s(t).
 
     Parameters:
-    s -- a 1d signal s(t,x,y,z)
+    s -- a 1d signal s(t)
     t -- a 1d array with time values corresponding to the signal s
     t0 -- a scalar; time values below this value are ignored
 
