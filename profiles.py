@@ -4,7 +4,7 @@
 import numpy as np
 from scipy import interpolate
 
-from boututils import file_import
+from boututils import file_import, DataFile
 from boutanalysis import grid
 
 
@@ -130,3 +130,58 @@ def interpolate2grid(prof, psi, grid_path, dim=2, pf='decreasing'):
         raise ValueError('Interpolation not supported above 2D')
 
     return prof_interp
+
+
+def write2grid(prof, prof_name, grid_path, overwrite=False):
+    '''Write profile to a specified grid file.
+
+    Parameters:
+    prof -- 1D or 2D array, an equilibrium quantity to be
+        written to the grid file. An easy way to generate
+        an appropriate profile is to use the interpolate2grid(...)
+        routine above
+    prof_name -- str, name assigned to profile in grid file
+    grid_path -- str, path to the grid file to interpolate onto
+    overwrite -- bool, if False, this will prevent overwiting
+        a preexisting grid variable with the same name as prof_name
+
+    Returns:
+    True if the write is successful, False otherwise.
+
+    '''
+    grid_file = DataFile(grid_path, write=True)
+
+    if not overwrite and (prof_name in grid_file.list()):
+        raise ValueError(prof_name + ' is already in use in '
+                + grid_path
+                + '. Specify overwrite=True to overwrite existing profile')
+
+    grid_file.write(prof_name, prof)
+
+    return 0
+
+
+def main():
+    # Grid file to modify
+    grid_path = '/global/homes/e/emd/cmod/1110201023/kinetic/grids/x516y128_psiin085_psiout105_pf095_6field.nc'
+
+    # Profile information
+    dir = '/global/homes/e/emd/cmod/1110201023/kinetic/profiles/'
+    info = '.1110201023.00900.psin105'
+    vars = ['Ne', 'Ni', 'Te', 'Ti']
+
+    # TODO: Are these written in the correct units???
+    for var in vars:
+        profile_path = dir + var + info
+        psi = csv_import(profile_path, 0)
+        profile = csv_import(profile_path, 1)
+
+        profile_grid = interpolate2grid(profile, psi, grid_path)
+
+        status = write2grid(profile_grid, var + 'exp', grid_path)
+
+    return 0
+
+
+if __name__ == '__main__':
+    main()
