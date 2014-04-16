@@ -170,11 +170,19 @@ def main():
     info = '.1110201023.00900.psin105'
     vars = ['Ne', 'Ni', 'Te', 'Ti']
 
-    # TODO: Are these written in the correct units???
-    for var in vars:
+    # BOUT++ 6-field simulations require units:
+    #   [density] = 1e20 m^{-3}
+    #   [temperature] = eV
+    # whereas the p-file has units
+    #   [density] = 1e20 m^{-3}
+    #   [temperature] = keV
+    # These scale factors are used to make the appropriate conversions
+    scale = [1e0, 1e0, 1e3, 1e3]
+
+    for i, var in enumerate(vars):
         profile_path = dir + var + info
         psi = csv_import(profile_path, 0)
-        profile = csv_import(profile_path, 1)
+        profile = scale[i] * csv_import(profile_path, 1)
 
         profile_grid = interpolate2grid(profile, psi, grid_path)
 
