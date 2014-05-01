@@ -3,6 +3,68 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+class KzSpec:
+    '''Spectra, growth rate, and frequency for each k_z Fourier mode.
+
+    Parameters:
+    -----------
+    s -- array, signal to be Fourier analyzed. It is assumed that
+        time is the first coordinate (e.g. s = s(t,...)) and that
+        z is the last coordinate (e.g. s = s(...,z))
+    dz -- scalar, the spacing between adjacent z-grid points;
+        [dz] = fractional torus circumference, that is
+
+                dz = 2 * pi / (ZPERIOD * (MZ - 1))
+
+        where ( 1 / ZPERIOD ) is the fraction of the torus simulated.
+        dz is computed by BOUT++ and can be read directly from
+        a BOUT++ dump file.
+    t -- array, the time array corresponding to the values in s(t).
+        If the user does *not* assign a value to t, a uniformly-spaced
+        time array with dt=1 is assumed.
+
+    Attributes:
+    -----------
+    sk -- array, of the same dimensions as the signal s(t,...,z),
+        giving the spatial Fourier transform (in z) of the signal
+    n -- array, the toroidal mode numbers corresponding to each
+        k_z mode such that sk = sk(t,...,n)
+    gammak -- array, of the same dimensions as the signal s(t,...,z),
+        giving the instantaneous local growth rate.
+        [gammak] = 1 / [t]
+    freqk -- array, of the same dimensions as the signal s(t,...,z),
+        giving the instantaneous local rotation frequency
+        in the z-direction; [freqk] = 1 / [t]
+
+    '''
+    def __init__(self, s, dz=1, t=None):
+        # Fourier transform in z, where z is *last* coordinate in signal
+        self.sk = np.fft.fft(s)
+
+        # The toroidal mode number, n
+        self.n = 2 * np.pi * np.fft.fftfreq(s.shape[-1], d=dz)
+
+        if t is None:
+            t = np.arange(s.shape[0])
+
+        # In order to broadcast the dt array with the signal array,
+        # we must add a dummy axis to the dt array for every spatial
+        # dimension of the signal array such that the dimensions
+        # of the two arrays are commensurate
+        dt = np.diff(t)
+        for axis in np.arange(len(s.shape[1:])):
+            dt = dt[:, np.newaxis]
+
+        # Determine the
+        #   (1) growth rate (gammak) and
+        #   (2) rotation frequency in the z-direction (freqk)
+        # for each k_z Fourier mode
+        lambdak = np.diff(np.log(self.sk), axis=0) / dt
+        self.gammak = np.real(lambdak)
+        self.freqk = np.imag(lambdak)
+
+
 def moment_xyzt(s):
     '''Calculate the moments of a 4d signal (t,x,y,z).
 
