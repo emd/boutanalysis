@@ -24,8 +24,10 @@ class RandomData:
         self.f = np.fft.fftfreq(s.shape[axis_t], d=dt)
         self.f = np.fft.fftshift(self.f)
 
-        # Obtain the phase
+        # Obtain the phase, phase in [0, 2 * pi)
         self.phase = np.angle(self.Sf)
+        ind = np.where(self.phase < 0)
+        self.phase[ind] += 2 * np.pi
 
 
 class KzSpec:
