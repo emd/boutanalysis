@@ -18,7 +18,7 @@ class RandomData:
             self.Sf += np.fft.fft(np.rollaxis(s, axis_ensemble)[sample,:],
                     axis=axis_t)
         self.Sf = self.Sf / s.shape[axis_ensemble]
-        self.Sf = np.fft.fftshift(self.Sf, axes=axis_ensemble)
+        self.Sf = np.fft.fftshift(self.Sf, axes=axis_t)
 
         # Obtain the corresponding frequencies
         self.f = np.fft.fftfreq(s.shape[axis_t], d=dt)
