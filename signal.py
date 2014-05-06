@@ -4,6 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class RandomData:
+    def __init__(self, s, dt=1, axis_t=0, axis_ensemble=-1):
+        # Initialize the Sf array to the proper dimensions
+        if axis_ensemble == -1:
+            shape = s.shape[:-1]
+        else:
+            shape = s.shape[:axis] + s.shape[(axis + 1):]
+        self.Sf = np.zeros(shape, dtype=complex)
+
+        # Take the ensemble averaged FFT in time
+        for sample in np.arange(s.shape[axis_ensemble]):
+            self.Sf += np.fft.fft(np.rollaxis(s, axis_ensemble)[sample,:],
+                    axis=axis_t)
+        self.Sf = self.Sf / s.shape[axis_ensemble]
+        self.Sf = np.fft.fftshift(self.Sf)
+
+        # Obtain the corresponding frequencies
+        self.f = np.fft.fftfreq(s.shape[axis_t], d=dt)
+        self.f = np.fft.fftshift(self.f)
+
+        # Obtain the phase
+        self.phase = np.angle(self.Sf)
+
+
 class KzSpec:
     '''Spectra, growth rate, and frequency for each k_z Fourier mode.
 
