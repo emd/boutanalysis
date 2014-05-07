@@ -50,10 +50,10 @@ class KzSpec:
 
     Attributes:
     -----------
-    sk -- array, of the same dimensions as the signal s(t,...,z),
+    Sk -- array, of the same dimensions as the signal s(t,...,z),
         giving the spatial Fourier transform (in z) of the signal
     n -- array, the toroidal mode numbers corresponding to each
-        k_z mode such that sk = sk(t,...,n)
+        k_z mode such that Sk = Sk(t,...,n)
     gammak -- array, of the same dimensions as the signal s(t,...,z),
         giving the instantaneous local growth rate.
         [gammak] = 1 / [t]
@@ -64,7 +64,7 @@ class KzSpec:
     '''
     def __init__(self, s, dz=1, t=None):
         # Fourier transform in z, where z is *last* coordinate in signal
-        self.sk = np.fft.fft(s)
+        self.Sk = np.fft.fft(s)
 
         # The toroidal mode number, n
         self.n = 2 * np.pi * np.fft.fftfreq(s.shape[-1], d=dz)
@@ -84,7 +84,7 @@ class KzSpec:
         #   (1) growth rate (gammak) and
         #   (2) rotation frequency in the z-direction (freqk)
         # for each k_z Fourier mode
-        lambdak = np.diff(np.log(self.sk), axis=0) / dt
+        lambdak = np.diff(np.log(self.Sk), axis=0) / dt
         self.gammak = np.real(lambdak)
         self.freqk = np.imag(lambdak)
 
