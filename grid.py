@@ -81,6 +81,23 @@ def outboard_midplane_index(g):
     return np.where(g['Rxy'] == np.max(g['Rxy']))[1]   
 
 
+def peak_gradient_index(g):
+    '''Return the *radial* index for the peak gradient of a BOUT++ grid.
+
+    Parameters:
+    g -- the BOUT++ grid file, i.e. as computed from Hypnotoad
+
+    Returns:
+    The radial index for the grid's peak gradient location.
+
+    NOTE: May run into problems with double null.
+
+    '''
+    pol_ind = g['Rxy'].shape[-1] / 2
+    gradp = np.diff(g['pressure'][:, pol_ind]) / np.diff(g['Rxy'][:, pol_ind])
+    return np.where(np.abs(gradp) == np.max(np.abs(gradp)))[0]
+
+
 def outboard_midplane_LCFS(g, units = 'cm'):
     '''Return array of distances from LCFS along outboard midplane.
     
